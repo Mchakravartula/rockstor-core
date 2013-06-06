@@ -39,10 +39,14 @@ AddShareView = Backbone.View.extend({
     var _this = this;
     this.pools.fetch({
       success: function(collection, response) {
+    	  
         $(_this.el).append(_this.template({pools: _this.pools, poolName: _this.poolName}));
         var size_err_msg = function() {
             return err_msg;
           }
+        
+        $(":range").rangeinput();
+        
         $.validator.addMethod('validateSize', function(value) {
             var share_size = $('#share_size').val();
             
@@ -54,6 +58,7 @@ AddShareView = Backbone.View.extend({
             return true;
          }, size_err_msg);
           
+        
         
         
         $('#add-share-form').validate({
