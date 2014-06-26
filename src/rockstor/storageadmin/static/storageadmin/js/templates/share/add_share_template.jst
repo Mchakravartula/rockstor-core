@@ -26,7 +26,7 @@
   <div class="span8">
     <label class="control-label"><span class="required">*</span> indicates required fields</label>
     <div class="form-box"> 
-      <form name="add-share-form" id="add-share-form">
+      <form name="add-share-form" id="add-share-form" class="form-horizontal">
         <div class="messages"></div>
         <div class="control-group">
           <label class="control-label" for="share_name">Name<span class="required"> *</span></label>
@@ -65,11 +65,11 @@
         </div>
 
         <div class="control-group">
-          <label class="control-label" for="share_size">Size<span class="required"> *</span></label>
+          <label class="control-label" for="share_size">Size in GB<span class="required"> *</span></label>
           <div class="controls">
             <input type="text" name="share_size" id="share_size" title="Enter share size in KB, MB, GB or TB">
-            </div>
-          <div id="slider"></div>
+            <div id="slider" style="margin-left: -25px"></div>
+          </div>
         </div>
         <div class="control-group">
           <div class="controls">

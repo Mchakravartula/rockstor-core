@@ -42,21 +42,26 @@ AddShareView =  RockstorLayoutView.extend({
     this.pools.pageSize = RockStorGlobals.maxPageSize;
     this.poolName = this.options.poolName;
     this.dependencies.push(this.pools);
+    this.numFormatter = d3.format(",.0f");
+    //this.tickFormatter = function(d) {
+      //var formatter = d3.format(",.2f");
+      //if (d > 1024*1024) {
+        //return formatter(d/(1024*1024)) + " TB";
+      //} else if (d > 1024) {
+        //return formatter(d/1024) + " GB";
+      //} else {
+        //return formatter(d) + " KB";
+      //}
+    //}
     this.tickFormatter = function(d) {
-      var formatter = d3.format(",.2f");
-      if (d > 1024*1024) {
-        return formatter(d/(1024*1024)) + " TB";
-      } else if (d > 1024) {
-        return formatter(d/1024) + " GB";
-      } else {
-        return formatter(d) + " KB";
-      }
+      return _this.numFormatter(d);
     }
     this.slider = null;
     this.sliderCallback = function(slider) {
       var value = slider.value();
       _this.$('#share_size').val(_this.tickFormatter(value));
     }
+    this.tickValues = null; this.stepValues = null;
   },
   
   render: function() {
@@ -158,15 +163,13 @@ AddShareView =  RockstorLayoutView.extend({
     // Get size of selected pool
     var pool_name = this.$('#pool_name').val();
     var selectedPool = this.pools.find(function(p) { return p.get('name') == pool_name; });
-    var maxPoolSize =  (selectedPool.get('size')- selectedPool.get('usage'))/1024;
-    console.log('maxPoolSize is ' + maxPoolSize);
-    
-    // calculate step values and tick values
-    var tmp = this.genTicksForShareSize(1, parseInt(maxPoolSize));
-     // Render slider
-    console.log('tickVal' + tmp[0]);
-    console.log('stepVal' + tmp[1]);
-    this.slider = d3.slider().min(0).max(maxPoolSize).tickValues(tmp[0]).stepValues(tmp[1]).tickFormat(this.tickFormatter).callback(this.sliderCallback);
+    console.log('selectedPool size is ' + selectedPool.get('size'));
+    var maxShareSize =  Math.floor((selectedPool.get('size')- selectedPool.get('usage'))/(1024*1024));
+    console.log('maxShareSize in GB is ' + maxShareSize);
+   
+    var tmp = this.genTicksForShareSize(1, maxShareSize);
+    this.tickValues = tmp[0]; this.stepValues = tmp[1];
+    this.slider = d3.slider().min(1).max(this.tickValues[this.tickValues.length-1]).tickValues(this.tickValues).stepValues(this.stepValues).tickFormat(this.tickFormatter).callback(this.sliderCallback).showRange(true);
     d3.select('#slider').call(this.slider);
 
   },
@@ -179,7 +182,8 @@ AddShareView =  RockstorLayoutView.extend({
 
   /* Tick and step values
    * Max size
-   * < 100 GB           - tick values every 10GB, steps at 5GB
+   * < 10 GB            - tick values every 1GB, steps at 1GB
+   * 10GB  - 100 GB     - tick values every 10GB, steps at 5GB
    * 100GB - 200GB      - tick values every 20GB, steps at 10GB
    * 200GB - 300GB      - tick values every 50GB, steps at 10GB
    * 300GB - 400GB      - tick values every 50GB, steps at 10GB
@@ -190,7 +194,7 @@ AddShareView =  RockstorLayoutView.extend({
    *
    */
   genTicksForShareSize: function(min, max) {
-    var tickValues=[], snapValues, tickStep, snapStep;
+    var tickValues=[], snapValues=[], tickStep, snapStep;
     // Assume inputs are in GB
     // convert min and max to nearest multiples of 10
     var tMin = min;
@@ -199,6 +203,7 @@ AddShareView =  RockstorLayoutView.extend({
       tMin = Math.ceil10(min, 1);
       tMax = Math.floor10(max, 1);
     }
+    console.log(tMax);
     var range = tMax - tMin;
     console.log('range is ' + range);
     if (range <= 10) {
@@ -221,13 +226,33 @@ AddShareView =  RockstorLayoutView.extend({
       tickStep = 500;
     }
     
-    snapValues = d3.range(0, tMax, snapStep);
-    snapValues[0] = 1;
+    for (var i=0; i<= tMax; i+=snapStep) {
+      snapValues.push(i==0 ? 1 : i);
+    }
     for (var i=0; i<= tMax; i+=tickStep) {
       tickValues.push(i==0 ? 1 : i);
     }
+    console.log(snapValues);
+    console.log(tickValues);
     return [tickValues, snapValues];
-  }
+  },
+
+  getHumanizedSizeAndUnits: function(size) {
+    var units = ['bytes', 'KB', 'Kb', 'MB', 'Mb', 'GB', 'Gb',
+      'TB', 'Tb', 'PB', 'Pb'];
+    var s = humanize.filesize(size);
+    var l = 0, unit = null, num = null;
+    _.each(units, function(u) {
+      if (s.indexOf((u)) != -1) {
+        l = u.length;
+        num = s.substring(0, s.length-l);
+        unit = s.substring(s.length-l);
+      }
+    });
+    console.log(num);
+    console.log(unit);
+    return [num, unit];
+  },
 
 
 });
