@@ -175,7 +175,7 @@ ProbeDetailView = RockstorLayoutView.extend({
     this.updateActions();
     this.updateTime();
 
-    this.$(".messages").html("<label class=\"error\">Probe Error!</label>");
+    this.$(".messages").html(this.errTemplate({msg: msg}));
   },
 
   setProbeEvents: function(probe) {

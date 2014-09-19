@@ -118,7 +118,7 @@ LoginView = Backbone.View.extend({
         //app_router.navigate('home', {trigger: true}) 
       },
       error: function(xhr, status, error) {
-        _this.$(".messages").html("<label class=\"error\">Login incorrect!</label>");
+        _this.$(".messages").html(this.errTemplate({msg: msg}));
       }
     });
   },
