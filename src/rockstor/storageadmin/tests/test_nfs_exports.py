@@ -66,7 +66,7 @@ class NFSExportTests(APITestMixin, APITestCase):
     def test_post_requests(self):
     
         # nfs-export without selecting the shares   
-        data = {'host_str': '*.test.co.uk', 'admin_host': 'yes', 'mod_choice': 'rw', 'sync_choice': 'async'}
+        data = {'host_str': '*.test.co.uk',  'mod_choice': 'rw', 'sync_choice': 'async'}
         response = self.client.post(self.BASE_URL, data=data)
         self.assertEqual(response.status_code,
                          status.HTTP_500_INTERNAL_SERVER_ERROR, msg=response.data)
@@ -74,7 +74,7 @@ class NFSExportTests(APITestMixin, APITestCase):
         self.assertEqual(response.data['detail'], e_msg)
         
         # nfs-export without selecting the share already mounted   
-        data = {'shares': ('share4', ), 'host_str': '*.test.co.uk', 'admin_host': 'yes', 'mod_choice': 'rw', 'sync_choice': 'async'}
+        data = {'shares': ('share4', ), 'host_str': '*.test.co.uk', 'mod_choice': 'rw', 'sync_choice': 'async'}
         self.mock_is_share_mounted.return_value = False
         response = self.client.post(self.BASE_URL, data=data)
         self.assertEqual(response.status_code,
@@ -82,7 +82,7 @@ class NFSExportTests(APITestMixin, APITestCase):
         self.mock_is_share_mounted.return_value = True
         
         # happy path
-        data = {'shares': ('share1', ), 'host_str': '*.test.co.uk', 'admin_host': 'yes', 'mod_choice': 'rw', 'sync_choice': 'async'}
+        data = {'shares': ('share1', ), 'host_str': '*.test.co.uk',  'mod_choice': 'rw', 'sync_choice': 'async'}
         response = self.client.post(self.BASE_URL, data=data)
         self.assertEqual(response.status_code,
                          status.HTTP_200_OK, msg=response.data)
@@ -96,7 +96,7 @@ class NFSExportTests(APITestMixin, APITestCase):
         
         # nfs-export without selecting the shares 
         nfs_id = 1  
-        data = {'host_str': '*.test.co.uk', 'admin_host': 'yes', 'mod_choice': 'rw', 'sync_choice': 'async'}
+        data = {'host_str': '*.test.co.uk', 'mod_choice': 'rw', 'sync_choice': 'async'}
         response = self.client.put('%s/%d' % (self.BASE_URL, nfs_id), data=data)
         self.assertEqual(response.status_code,
                          status.HTTP_500_INTERNAL_SERVER_ERROR, msg=response.data)
@@ -104,7 +104,7 @@ class NFSExportTests(APITestMixin, APITestCase):
         self.assertEqual(response.data['detail'], e_msg)
         
         nfs_id = 1
-        data = {'shares': ('share1','share4' ), 'host_str': '*.test.co.uk', 'admin_host': 'yes', 'mod_choice': 'rw', 'sync_choice': 'async'}
+        data = {'shares': ('share1','share4' ), 'host_str': '*.test.co.uk', 'mod_choice': 'rw', 'sync_choice': 'async'}
         self.mock_is_share_mounted.return_value = False
         response = self.client.put('%s/%d' % (self.BASE_URL, nfs_id), data=data)
         self.assertEqual(response.status_code,
@@ -113,13 +113,13 @@ class NFSExportTests(APITestMixin, APITestCase):
         
         # edit nfs export
         nfs_id = 1
-        data = {'shares': ('share1','share4' ), 'host_str': '*.test.co.uk', 'admin_host': 'yes', 'mod_choice': 'rw', 'sync_choice': 'async'}
+        data = {'shares': ('share1','share4' ), 'host_str': '*.test.co.uk', 'mod_choice': 'rw', 'sync_choice': 'async'}
         response = self.client.put('%s/%d' % (self.BASE_URL, nfs_id), data=data)
         self.assertEqual(response.status_code,
                          status.HTTP_200_OK, msg=response.data)
         # edit removing the exiting share
         nfs_id = 1
-        data = {'shares': ('share3', ), 'host_str': '*.test.co.uk', 'admin_host': 'yes', 'mod_choice': 'rw', 'sync_choice': 'async'}
+        data = {'shares': ('share3', ), 'host_str': '*.test.co.uk',  'mod_choice': 'rw', 'sync_choice': 'async'}
         response = self.client.put('%s/%d' % (self.BASE_URL, nfs_id), data=data)
         self.assertEqual(response.status_code,
                          status.HTTP_200_OK, msg=response.data)
