@@ -86,8 +86,57 @@ class NFSExportTests(APITestMixin, APITestCase):
         response = self.client.post(self.BASE_URL, data=data)
         self.assertEqual(response.status_code,
                          status.HTTP_200_OK, msg=response.data)
+                         
+    def test_post_invalid_host_string1(self):
         
-
+        # nfs-export with invalid host_str  
+        data = {'shares': ('share5', ),'host_str': '%%%%',  'mod_choice': 'rw', 'sync_choice': 'async'}
+        response = self.client.post(self.BASE_URL, data=data)
+        self.assertEqual(response.status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR, msg=response.data)
+        e_msg = ('Host String: %%%% is not valid')
+        self.assertEqual(response.data['detail'], e_msg)
+     
+    def test_post_invalid_host_string2(self):
+        
+        # nfs-export with empty host_str  
+        data = {'shares': ('share5', ),'host_str': '',  'mod_choice': 'rw', 'sync_choice': 'async'}
+        response = self.client.post(self.BASE_URL, data=data)
+        self.assertEqual(response.status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR, msg=response.data)
+        e_msg = ('Cannot export without host string')
+        self.assertEqual(response.data['detail'], e_msg)
+            
+    def test_post_invalid_admin_host1(self):  
+      
+        # nfs-export with invalid admin_host 
+        data = {'shares': ('share6', ), 'host_str': '*.test.co.uk', 'admin_host':'###', 'mod_choice': 'rw', 'sync_choice': 'async'}
+        response = self.client.post(self.BASE_URL, data=data)
+        self.assertEqual(response.status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR, msg=response.data)
+        e_msg = ('Admin host: ### is not valid')
+        self.assertEqual(response.data['detail'], e_msg)
+    
+    def test_post_invalid_admin_host2(self):  
+      
+        # nfs-export with invalid admin_host 
+        data = {'shares': ('share6', ), 'host_str': '*.test.co.uk', 'admin_host':'1234', 'mod_choice': 'rw', 'sync_choice': 'async'}
+        response = self.client.post(self.BASE_URL, data=data)
+        self.assertEqual(response.status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR, msg=response.data)
+        e_msg = ('Admin host: 1234 is not valid')
+        self.assertEqual(response.data['detail'], e_msg)
+        
+    def test_post_invalid_admin_host3(self):  
+      
+        # nfs-export with invalid admin_host 
+        data = {'shares': ('share6', ), 'host_str': '*.test.co.uk', 'admin_host':'rocky', 'mod_choice': 'rw', 'sync_choice': 'async'}
+        response = self.client.post(self.BASE_URL, data=data)
+        self.assertEqual(response.status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR, msg=response.data)
+        e_msg = ('Admin host: rocky is not valid')
+        self.assertEqual(response.data['detail'], e_msg)    
+ 
     def test_put_requests(self):
         """
         1. Edit samba that does not exists
@@ -117,15 +166,81 @@ class NFSExportTests(APITestMixin, APITestCase):
         response = self.client.put('%s/%d' % (self.BASE_URL, nfs_id), data=data)
         self.assertEqual(response.status_code,
                          status.HTTP_200_OK, msg=response.data)
-        # edit removing the exiting share
+                         
+        # edit nfs export, replace the existing share with new one 
         nfs_id = 1
         data = {'shares': ('share3', ), 'host_str': '*.test.co.uk',  'mod_choice': 'rw', 'sync_choice': 'async'}
         response = self.client.put('%s/%d' % (self.BASE_URL, nfs_id), data=data)
         self.assertEqual(response.status_code,
                          status.HTTP_200_OK, msg=response.data)
 
-    def test_delete_requests(self):
-
+    def test_put_invalid_host_string1(self):
+        
+        # edit nfs-export with invalid host_str
+        nfs_id = 1  
+        data = {'shares': ('share5', ),'host_str': '%%%%',  'mod_choice': 'rw', 'sync_choice': 'async'}
+        response = self.client.put('%s/%d' % (self.BASE_URL, nfs_id), data=data)
+        self.assertEqual(response.status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR, msg=response.data)
+        e_msg = ('Host String: %%%% is not valid')
+        self.assertEqual(response.data['detail'], e_msg)
+     
+    def test_put_invalid_host_string2(self):
+        
+        # edit nfs-export with empty host_str  
+        nfs_id = 1  
+        data = {'shares': ('share5', ),'host_str': '',  'mod_choice': 'rw', 'sync_choice': 'async'}
+        response = self.client.put('%s/%d' % (self.BASE_URL, nfs_id), data=data)
+        self.assertEqual(response.status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR, msg=response.data)
+        e_msg = ('Cannot export without host string')
+        self.assertEqual(response.data['detail'], e_msg)
+            
+    def test_put_invalid_admin_host1(self):  
+      
+        # edit nfs-export with invalid admin_host 
+        nfs_id = 1  
+        data = {'shares': ('share6', ), 'host_str': '*.test.co.uk', 'admin_host':'###', 'mod_choice': 'rw', 'sync_choice': 'async'}
+        response = self.client.put('%s/%d' % (self.BASE_URL, nfs_id), data=data)
+        self.assertEqual(response.status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR, msg=response.data)
+        e_msg = ('Admin host: ### is not valid')
+        self.assertEqual(response.data['detail'], e_msg)
+    
+    def test_put_invalid_admin_host2(self):  
+      
+        # edit nfs-export with invalid admin_host 
+        nfs_id = 1  
+        data = {'shares': ('share6', ), 'host_str': '*.test.co.uk', 'admin_host':'1234', 'mod_choice': 'rw', 'sync_choice': 'async'}
+        response = self.client.put('%s/%d' % (self.BASE_URL, nfs_id), data=data)
+        self.assertEqual(response.status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR, msg=response.data)
+        e_msg = ('Admin host: 1234 is not valid')
+        self.assertEqual(response.data['detail'], e_msg)
+        
+    def test_put_invalid_admin_host3(self):  
+      
+        # edit nfs-export with invalid admin_host 
+        nfs_id = 1  
+        data = {'shares': ('share6', ), 'host_str': '*.test.co.uk', 'admin_host':'rocky', 'mod_choice': 'rw', 'sync_choice': 'async'}
+        response = self.client.put('%s/%d' % (self.BASE_URL, nfs_id), data=data)
+        self.assertEqual(response.status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR, msg=response.data)
+        e_msg = ('Admin host: rocky is not valid')
+        self.assertEqual(response.data['detail'], e_msg)  
+        
+          
+    def test_invalid_delete_requests(self):
+        
+        # deleted nfs-export that does not exist
+        nfs_id = 5
+        response = self.client.delete('%s/%d' % (self.BASE_URL, nfs_id))
+        self.assertEqual(response.status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR, msg=response.data)
+        e_msg = ('NFS export for the id(5) does not exist')
+        self.assertEqual(response.data['detail'], e_msg)  
+        
+    def test_delete_requests(self):                     
         # happy path
         nfs_id = 3
         response = self.client.delete('%s/%d' % (self.BASE_URL, nfs_id))
