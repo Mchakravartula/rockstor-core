@@ -89,8 +89,7 @@ class UserTests(APITestMixin, APITestCase):
                              status.HTTP_500_INTERNAL_SERVER_ERROR, msg=response.data)
             e_msg = ("Username is invalid. It must confirm to the regex: [A-Za-z][-a-zA-Z0-9_]*$")
             self.assertEqual(response.data['detail'], e_msg)
-
-
+ 
         # username with more than 30 characters
         invalid_user_name = 'user'*11
         data = {'username': invalid_user_name,'password': 'pwadmin',}
@@ -168,7 +167,15 @@ class UserTests(APITestMixin, APITestCase):
         self.assertEqual(response.status_code,
                          status.HTTP_200_OK, msg=response.data)
         self.assertEqual(response.data['username'], 'newUser2')
-
+        
+    def test_invalid_UID(self):     
+        # Create username with non int UID
+        data = {'username': 'newUser','password': 'pwuser2', 'group': 'admin', 'uid':'string'}
+        response = self.client.post(self.BASE_URL, data=data)
+        self.assertEqual(response.status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR, msg=response.data)
+        e_msg = ("UID must be an integer")
+        self.assertEqual(response.data['detail'], e_msg)
 
     def test_duplicate_name2(self):
 
